@@ -86,6 +86,23 @@ namespace entra21_tests
                                      // \/ E NAO ALTERA A LISTA (multiplicationTable)
             return multiplicationTable.Select(item => item * number);
 		}
+
+
+        public List <(int id, string name, int votes)> Candidates {get ; set;}
+
+        public bool CreateCandidate(List<(int id,string name)> candidates,string password)
+        {
+            if(password == "Pa$$w0rd")
+            {
+                Candidates = candidates.Select(item => {
+                    return (item.id, item.name,0);
+                }).ToList();
+
+                return true;
+            }
+                return false;
+        }
+
     }
 
      

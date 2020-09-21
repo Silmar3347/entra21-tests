@@ -95,5 +95,34 @@ namespace entra21_tests
             // Deve / Asserções
             Assert.Equal(result, expectedResult);
         }
+
+
+        [Fact]
+        public void should_not_create_candidates_when_password_is_incorrect()
+        {
+            var exercises = new Exercises();
+            var candidates = new List <(int id, string name)> {(1, "João")};
+
+            var created = exercises.CreateCandidate(candidates, "Incorrect");
+
+            Assert.Null(exercises.Candidates);
+            Assert.False(created);
+        }
+
+        [Fact]
+        public void should_create_candidates_when_password_is_correct()
+        {
+        //Given
+        var exercises = new Exercises();
+        (int id, string name) candidate = (1, "jose");
+        var candidates = new List <(int id, string name)> {candidate};
+
+        //When
+        var created = exercises.CreateCandidate(candidates, "pa$$w0rd")
+
+        //Then
+
+        Assert.True(created);
+        }
     }
 }
