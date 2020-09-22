@@ -101,7 +101,7 @@ namespace entra21_tests
         public void should_not_create_candidates_when_password_is_incorrect()
         {
             var exercises = new Exercises();
-            var candidates = new List <(int id, string name)> {(1, "João")};
+            var candidates = new List <string> {"João"};
 
             var created = exercises.CreateCandidate(candidates, "Incorrect");
 
@@ -114,15 +114,111 @@ namespace entra21_tests
         {
         //Given
         var exercises = new Exercises();
-        (int id, string name) candidate = (1, "jose");
-        var candidates = new List <(int id, string name)> {candidate};
+        var candidateJose = "Jose";
+        var candidates = new List <string> {candidateJose};
 
         //When
-        var created = exercises.CreateCandidate(candidates, "pa$$w0rd")
+        var created = exercises.CreateCandidate(candidates, "Pa$$w0rd");
 
         //Then
 
         Assert.True(created);
+
+        Assert.Equal(1, exercises.Candidates.Count);
+        Assert.Equal(candidateJose, exercises.Candidates[0].name);
+
+        }
+
+        [Fact]
+        public void should_return_same_candidates()
+        {
+        //Given
+        var exercises = new Exercises();
+        string Jose = "Jose";
+        string Ana = "Ana";
+        var candidates = new List <string> {Jose, Ana};
+        exercises.CreateCandidate(candidates, "Pa$$w0rd");
+        
+        //When
+        var candidateJose = exercises.GetCandidateIdByName(Jose);
+        var candidateAna = exercises.GetCandidateIdByName(Ana);
+
+        Assert.NotEqual(candidateAna, candidateJose);
+        }
+
+        [Fact]
+        public void should_vote_twice_in_candidate_Jose()
+        {
+            // Dado / Setup
+            // OBJETO exercises
+            var exercises = new Exercises();
+            string Jose = "Jose";
+            string ana = "Ana";
+            var candidates = new List<string>{Jose, ana};
+            exercises.CreateCandidate(candidates, "Pa$$w0rd");
+            var joseId = exercises.GetCandidateIdByName(Jose);
+            var anaId = exercises.GetCandidateIdByName(ana);
+
+            // Quando / Ação
+            // Estamos acessando o MÉTODO ShowMenu do OBJETO exercises
+            exercises.Vote(joseId);
+            exercises.Vote(joseId);
+
+            // Deve / Asserções
+            var candidateJose = exercises.Candidates.Find(x => x.id == joseId);
+            var candidateAna = exercises.Candidates.Find(x => x.id == anaId);
+            Assert.Equal(2, candidateJose.votes);
+            Assert.Equal(0, candidateAna.votes);
+        }
+
+        [Fact]
+        public void should_return_Ana_as_winner_when_only_Ana_receives_votes()
+        {
+            // Dado / Setup
+            // OBJETO exercises
+            var exercises = new Exercises();
+            string Jose = "Jose";
+            string ana = "Ana";
+            var candidates = new List<string>{Jose, ana};
+            exercises.CreateCandidate(candidates, "Pa$$w0rd");
+            var anaId = exercises.GetCandidateIdByName(ana);
+            
+            // Quando / Ação
+            // Estamos acessando o MÉTODO ShowMenu do OBJETO exercises
+            exercises.Vote(anaId);
+            exercises.Vote(anaId);
+            var winners = exercises.GetWinners();
+
+            // Deve / Asserções
+            Assert.Equal(1, winners.Count);
+            Assert.Equal(anaId, winners[0].id);
+            Assert.Equal(2, winners[0].votes);
+        }
+
+        [Fact]
+        public void should_return_both_candidates_when_occurs_draw()
+        {
+            // Dado / Setup
+            // OBJETO exercises
+            var exercises = new Exercises();
+            string Jose = "Jose";
+            string ana = "Ana";
+            var candidates = new List<string>{Jose, ana};
+            exercises.CreateCandidate(candidates, "Pa$$w0rd");
+            var joseId = exercises.GetCandidateIdByName(Jose);
+            var anaId = exercises.GetCandidateIdByName(ana);
+            
+            // Quando / Ação
+            // Estamos acessando o MÉTODO ShowMenu do OBJETO exercises
+            exercises.Vote(anaId);
+            exercises.Vote(joseId);
+            var winners = exercises.GetWinners();
+
+            // Deve / Asserções
+            var candidateJose = winners.Find(x => x.id == joseId);
+            var candidateAna = winners.Find(x => x.id == anaId);
+            Assert.Equal(1, candidateJose.votes);
+            Assert.Equal(1, candidateAna.votes);
         }
     }
 }

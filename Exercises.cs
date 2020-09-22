@@ -88,14 +88,15 @@ namespace entra21_tests
 		}
 
 
-        public List <(int id, string name, int votes)> Candidates {get ; set;}
+        public List <(Guid id, string name, int votes)> Candidates {get ; set;}
 
-        public bool CreateCandidate(List<(int id,string name)> candidates,string password)
+        public bool CreateCandidate(List<string> candidatesNames,string password)
         {
+
             if(password == "Pa$$w0rd")
             {
-                Candidates = candidates.Select(item => {
-                    return (item.id, item.name,0);
+                Candidates = candidatesNames.Select(item => {
+                    return (Guid.NewGuid(), item, 0);
                 }).ToList();
 
                 return true;
@@ -103,6 +104,48 @@ namespace entra21_tests
                 return false;
         }
 
+        public Guid GetCandidateIdByName(string name)
+        {
+            return Candidates.First(x => x.name == name).id;
+        }
+        
+        
+        public void Vote(Guid id)
+        {
+            Candidates = Candidates.Select(item => {
+                return item.id == id ? (item.id, item.name, item.votes + 1) : item;
+            }).ToList();
+        }
+
+        public List<(Guid id, string name, int votes)> GetWinners()
+        {
+            var winners = new List<(Guid id, string name, int votes)>{Candidates[0]};
+
+            for (int i = 1; i < Candidates.Count; i++)
+            {
+                if (Candidates[i].votes > winners[0].votes)
+                {
+                    winners.Clear();
+                    winners.Add(Candidates[i]);
+                }
+                else if (Candidates[i].votes == winners[0].votes)
+                {
+                    winners.Add(Candidates[i]);
+                }
+            }
+            return winners;
+        }
+
+        public List<(string cpf, string name)> CpfCandidates()
+        {
+
+        }
+        
+        
+        
+        
+
+        
     }
 
      
